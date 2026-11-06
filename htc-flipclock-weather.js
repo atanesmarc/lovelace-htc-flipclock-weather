@@ -10,6 +10,7 @@ var intervalSetNewTime = ''
 import { regional } from './regional.js?v1.1.5';
 import { themes } from './themes.js?v1.0.3';
 var forecastFinished = false;
+var hourlyForecasts = [];
 var forecasts = {};
 const weatherDefaults = {
     widgetPath: '/local/custom_ui/htc-weather/',
@@ -172,6 +173,12 @@ class HtcWeather extends LitElement {
             }
         }
         if (!this._config.high_low_entity) {
+            if (self._config.renderHourly && !forecastFinished) {
+                HtcWeather.getHass.callService('weather', 'get_forecasts', { 'type': 'hourly' }, { 'entity_id': self._config.entity }, false, true).then(function (res) {
+                    hourlyForecasts = res.response[self._config.entity].forecast || [];
+                    if (self.content) self.renderCard();
+                }).catch(function () { });
+            }
             HtcWeather.getHass.callService('weather', 'get_forecasts', { 'type': 'daily' }, { 'entity_id': self._config.entity }, false, true).then(function (res) {
                 forecastFinished = true;
                 forecasts = res.response[self._config.entity].forecast; self.renderCard()
@@ -240,6 +247,9 @@ class HtcWeather extends LitElement {
         var container_size = '470px'
         if (!this._config.renderForecast) {
             var container_size = '320px'
+        }
+        if (this._config.renderHourly && this._config.renderForecast) {
+            container_size = (parseInt(container_size) + 96) + 'px'
         }
         const container = document.createElement('div');
         container.id = 'htc-weather-card-container';
@@ -354,7 +364,7 @@ class HtcWeather extends LitElement {
             + weatherIcon
             + ') 50% 0 no-repeat');
         var weather = `<div id="local">
-                            <p class="city">${stateObj.attributes.friendly_name}</p>
+                            <p class="city">${config.name || stateObj.attributes.friendly_name}</p>
                             ${curr_temp}
                         </div>`;
         weather += HtcWeather.getHighLow();
@@ -385,6 +395,27 @@ class HtcWeather extends LitElement {
         }
         if (config.renderDetails) {
             HtcWeather.renderDetails(elem, config, stateObj, hass_states)
+        }
+        if (config.renderHourly && hourlyForecasts.length) {
+            var now_ms = Date.now() - 3600000;
+            var upcoming = hourlyForecasts.filter(function (h) { return new Date(h.datetime).getTime() >= now_ms; }).slice(0, config.hourlyCount || 8);
+            var sunObj = hass_states['sun.sun'];
+            var riseH = sunObj ? new Date(sunObj.attributes.next_rising) : null;
+            var setH = sunObj ? new Date(sunObj.attributes.next_setting) : null;
+            var riseF = riseH ? riseH.getHours() + riseH.getMinutes() / 60 : 7;
+            var setF = setH ? setH.getHours() + setH.getMinutes() / 60 : 18;
+            var hourlyHtml = '<ul id="hourly">';
+            upcoming.forEach(function (h) {
+                var hd = new Date(h.datetime);
+                var hf = hd.getHours() + hd.getMinutes() / 60;
+                var night = !(hf >= riseF && hf < setF);
+                var iconName = (night ? weatherIconsNight[h.condition] : weatherIconsDay[h.condition]) || weatherIconsDay[h.condition] || weatherIconsDay['cloudy'];
+                hourlyHtml += `<li><span class="htime">${hd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</span>` +
+                    `<img src="${config.weatherImagesPath}${iconName}.png" alt="${h.condition}" title="${h.condition}" />` +
+                    `<span class="htemp">${Math.round(h.temperature)}${HtcWeather.getUnit("temperature")}</span></li>`;
+            });
+            hourlyHtml += '</ul>';
+            $(elem).append(hourlyHtml);
         }
     }
 
@@ -606,9 +637,9 @@ class HtcWeather extends LitElement {
             $(elem).append(`<div id="bottom">
                 <div id="sun_details"></div>
                 <div id="wind_details"></div>
-                <div id="update">
+                ${config.hideUpdate ? '' : `<div id="update">
                     <img src="${config.imagesPath}refresh_grey.png" alt="Last update" title="Last update" id="reload" />${new Date(stateObj.last_updated).toLocaleTimeString()}
-                </div>
+                </div>`}
             </div>`);
             var sun_details = `<font color="orange">☀</font> <font color="green"><ha-icon icon="mdi:weather-sunset-up"></ha-icon></font>&nbsp;${next_rising.toLocaleTimeString()}&nbsp;&nbsp;&nbsp;<font color="red"><ha-icon icon="mdi:weather-sunset-down"></ha-icon></font>&nbsp;${next_setting.toLocaleTimeString()}`;
             $(elem).find('#sun_details').append(sun_details);
@@ -639,8 +670,13 @@ class HtcWeather extends LitElement {
     getScript() { }
 
     getStyle(config) {
-
-        return themes[config.theme['name']]['css'];
+        var theme = themes[config.theme['name']] || themes['default'];
+        return theme['css'] + `
+            #htc-weather #hourly { list-style:none; margin:4px 0 0; padding:0; display:flex; justify-content:space-between; width:440px; }
+            #htc-weather #hourly li { flex:1; text-align:center; font-size:11px; color:#555; }
+            #htc-weather #hourly li img { width:30px; height:30px; display:block; margin:2px auto; }
+            #htc-weather #hourly li .htemp { display:block; font-weight:bold; font-size:12px; color:#222; }
+        `;
     }
     static get styles() {
         // return css(themes[this._config.theme['name']]['css']);
