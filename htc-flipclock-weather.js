@@ -113,7 +113,7 @@ class HtcWeather extends LitElement {
     }
 
     async importJquery() {
-        await import("./lib/jquery-3.4.1.min.js")
+        await import("./jquery-3.4.1.min.js")
         return { config: this._config, entity: this.hass.states[this._config.entity], hass_states: this.hass.states }
     }
 

@@ -1,6 +1,5 @@
 {
   "name": "HTC Flip Clock Weather",
-  "filename": "htc-weather.zip",
-  "zip_release": true,
+  "filename": "htc-flipclock-weather.js",
   "render_readme": true
 }
