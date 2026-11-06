@@ -204,14 +204,30 @@ class HtcWeather extends LitElement {
             }
         }
 
-        if (!this.content || !forecastFinished) {
+        var tState = this.hass.states['sensor.date_time_iso'];
+        var tNow = tState ? tState.state : '';
+        if (!this.content || !forecastFinished || tNow !== this._lastTime) {
+            var hourChanged = this._lastTime && forecastFinished && tNow.slice(0, 13) !== this._lastTime.slice(0, 13);
+            this._lastTime = tNow;
             this.renderCard();
+            if (hourChanged) this.refetchForecasts();
         }
         return html`
             <ha-card @click="${this._handleClick}">
             ${this.content}
             </ha-card>
         `;
+    }
+    refetchForecasts() {
+        const self = this;
+        ['daily', 'hourly'].forEach(function (type) {
+            if (type === 'hourly' && !self._config.renderHourly) return;
+            HtcWeather.getHass.callService('weather', 'get_forecasts', { 'type': type }, { 'entity_id': self._config.entity }, false, true).then(function (res) {
+                var f = res.response[self._config.entity].forecast || [];
+                if (type === 'daily') { forecasts = f; } else { hourlyForecasts = f; }
+                self.renderCard();
+            }).catch(function () { });
+        });
     }
     waitForForecasts() {
         if (forecastFinished === false) {
