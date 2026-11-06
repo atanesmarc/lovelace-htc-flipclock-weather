@@ -653,3 +653,11 @@ async function waitForForecasts(test) {
     while (!test()) await new Promise(resolve => setTimeout(resolve, delayMs));
 }
 customElements.define("htc-weather-card", HtcWeather);
+
+window.customCards = window.customCards || [];
+window.customCards.push({
+    type: "htc-weather-card",
+    name: "HTC Flip Clock Weather",
+    description: "Flip clock with weather forecast",
+    preview: false
+});
