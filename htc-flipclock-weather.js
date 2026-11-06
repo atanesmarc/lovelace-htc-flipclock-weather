@@ -197,12 +197,12 @@ class HtcWeather extends LitElement {
             }
         }
 
-        if (forecastFinished && this.content) {
-            return html``
+        if (!this.content || !forecastFinished) {
+            this.renderCard();
         }
         return html`
             <ha-card @click="${this._handleClick}">
-            ${self.renderCard()}
+            ${this.content}
             </ha-card>
         `;
     }
