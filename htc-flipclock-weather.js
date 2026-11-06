@@ -8,7 +8,7 @@ import {
 var old_time = {}
 var intervalSetNewTime = ''
 import { regional } from './regional.js?v1.1.5';
-import { themes } from './themes.js?v1.0.2';
+import { themes } from './themes.js?v1.0.3';
 var forecastFinished = false;
 var forecasts = {};
 const weatherDefaults = {

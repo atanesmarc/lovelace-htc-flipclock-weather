@@ -8,7 +8,7 @@ export const themes = {
     		    overflow:hidden;
     		    font-family:Arial, Verdana, Tahoma, Helvetica, sans-serif;
     		    margin: auto;
-                background: url("../local/custom_ui/htc-weather/themes/default/background.png") 50% 40px no-repeat;
+                background: url("https://cdn.jsdelivr.net/gh/atanesmarc/lovelace-htc-flipclock-weather@v1.4.3/themes/default/background.png") 50% 40px no-repeat;
     		}
 
     		#htc-weather-card-container p {
