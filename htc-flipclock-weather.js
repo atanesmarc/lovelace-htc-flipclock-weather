@@ -197,7 +197,7 @@ class HtcWeather extends LitElement {
             }
         }
 
-        if (forecastFinished) {
+        if (forecastFinished && this.content) {
             return html``
         }
         return html`
