@@ -397,7 +397,7 @@ class HtcWeather extends LitElement {
 
                 var d_day_code = String(i) + '_resume';
                 var d_date = new Date(forecasts[i].datetime);
-                var forecastIcon = HtcWeather.getWeatherIcon(config, forecasts[i].condition, hass_states)
+                var forecastIcon = HtcWeather.getWeatherIcon(config, forecasts[i].condition, hass_states, i === 0)
                 var forecast = `<li>`;
                 forecast += `<p class="dayname">${regional[config.lang]['dayNames'][d_date.getDay()]}&nbsp;${d_date.getDate()}</p>
                                 <img src="${forecastIcon}" alt="${forecasts[i].condition}" title="${forecasts[i].condition}" />
@@ -668,12 +668,10 @@ class HtcWeather extends LitElement {
         return
     }
 
-    static getWeatherIcon(config, condition) {
+    static getWeatherIcon(config, condition, _states, allowNight = true) {
         var hass_states = HtcWeather.getHass.states
-        return `${config.weatherImagesPath}${hass_states["sun.sun"] && hass_states["sun.sun"] == "below_horizon"
-            ? weatherIconsNight[condition]
-            : weatherIconsDay[condition]
-            }.png`;
+        var night = allowNight && hass_states["sun.sun"] && hass_states["sun.sun"].state === "below_horizon";
+        return `${config.weatherImagesPath}${(night ? weatherIconsNight[condition] : weatherIconsDay[condition]) || weatherIconsDay[condition]}.png`;
     }
 
     _handleClick(entity) {
