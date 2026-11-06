@@ -174,7 +174,7 @@ class HtcWeather extends LitElement {
         if (!this._config.high_low_entity) {
             HtcWeather.getHass.callService('weather', 'get_forecasts', { 'type': 'daily' }, { 'entity_id': self._config.entity }, false, true).then(function (res) {
                 forecastFinished = true;
-                forecasts = res.response[self._config.entity].forecast
+                forecasts = res.response[self._config.entity].forecast; self.renderCard()
             })
         }
         this.render();
