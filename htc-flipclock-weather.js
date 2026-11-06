@@ -687,9 +687,10 @@ class HtcWeather extends LitElement {
         var theme = themes[config.theme['name']] || themes['default'];
         return theme['css'] + `
             #htc-weather #hourly { list-style:none; margin:10px 0 0; padding:0; display:flex; justify-content:space-between; width:440px; }
-            #htc-weather #hourly li { flex:1; text-align:center; font-size:13px; color:#555; }
+            #htc-weather #hourly li { flex:1; text-align:center; font-size:13px; color:var(--secondary-text-color,#555); }
+            #htc-weather #forecast li { border-left-color: var(--divider-color, rgb(217,217,217)); }
             #htc-weather #hourly li img { width:58px; height:50px; object-fit:contain; display:block; margin:4px auto; }
-            #htc-weather #hourly li .htemp { display:block; font-weight:bold; font-size:14px; color:#222; }
+            #htc-weather #hourly li .htemp { display:block; font-weight:bold; font-size:14px; color:var(--primary-text-color,#222); }
         `;
     }
     static get styles() {
