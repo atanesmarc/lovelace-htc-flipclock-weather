@@ -47,8 +47,8 @@ const weatherIconsDay = {
     snowy: "snowy",
     "snowy-rainy": "snowy-rainy",
     sunny: "sunny",
-    windy: "cloudy",
-    "windy-variant": "cloudy-day-3",
+    windy: "windy",
+    "windy-variant": "windy",
     exceptional: "na"
 };
 
@@ -58,7 +58,8 @@ const weatherIconsNight = {
     clear: "night",
     sunny: "night",
     partlycloudy: "cloudy-night-3",
-    "windy-variant": "cloudy-night-3"
+    windy: "windy-night",
+    "windy-variant": "windy-night"
 };
 
 
