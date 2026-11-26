@@ -372,7 +372,12 @@ class HtcWeather extends LitElement {
         var config = HtcWeather.getConfig;
         var stateObj = HtcWeather.getHass.states[HtcWeather.getConfig.entity];
         var hass_states = HtcWeather.getHass.states;
-        var temp_now = Math.round(stateObj.attributes.temperature * 100) / 100
+        var temp_src = stateObj.attributes.temperature;
+        if (config.temp_entity) {
+            var tObj = hass_states[config.temp_entity];
+            if (tObj && !isNaN(parseFloat(tObj.state))) temp_src = parseFloat(tObj.state);
+        }
+        var temp_now = Math.round(temp_src * 100) / 100
         var weatherIcon = HtcWeather.getWeatherIcon(config, stateObj.state)
         var curr_temp = `<p class="temp">${String(temp_now)}
                        <span class="metric">

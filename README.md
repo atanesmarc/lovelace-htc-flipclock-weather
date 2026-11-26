@@ -75,6 +75,7 @@ display_options:
 | renderClock | bool | optional | Render clock.
 | renderDetails | bool | optional | Render sunt details and wind.
 | high_low_entity | bool | optional | Replace high / low temperature with a custom entity. Params available entity_id, name. Default high / low temperature today
+| temp_entity | string | optional | Sensor entity_id whose state replaces the current temperature (default: weather entity temperature attribute)
 | renderDetails | bool | optional | Render sunt details and wind.
 | theme.name |  | optional | Change theme (default/dusk).
 | theme.weather_icon_set |  | optional | Change theme icon set. For default you have `picto` alternative. For dusk you have `htc` alternative
